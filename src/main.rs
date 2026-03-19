@@ -14,6 +14,7 @@ struct Devlog {
 }
 
 fn main() {
+    let _ = dotenv::dotenv();
     let token = env::var("FT_API_KEY").expect("Failed to get API key from env");
     let url = "https://flavortown.hackclub.com/api/v1/devlogs";
     let client = reqwest::blocking::Client::new();
@@ -21,7 +22,7 @@ fn main() {
         .send().expect("Failed to fetch")
         .json().expect("Failed to parse");
     
-    for devlog in resp.devlogs.iter() {
-        println!("{:?}", devlog);
+    for devlog in resp.devlogs.iter().take(2) {
+        println!("{}", devlog.body);
     }
 }
