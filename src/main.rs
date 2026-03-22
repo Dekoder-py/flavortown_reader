@@ -5,7 +5,8 @@ use ratatui::{
         event::{Event, KeyCode},
     },
     layout::{Constraint, Direction, Layout},
-    widgets::Paragraph,
+    style::{Color, Stylize},
+    widgets::{Block, Borders, Paragraph},
 };
 use std::{env, str::FromStr};
 use tui_markdown;
@@ -85,7 +86,11 @@ fn render(frame: &mut Frame, state: &mut State) {
         ])
         .split(frame.area());
 
-    frame.render_widget(Paragraph::new("Flavortown Reader"), outer_layout[0]);
+    frame.render_widget(
+        Paragraph::new("Flavortown Reader")
+            .block(Block::new().bold().fg(Color::Cyan).borders(Borders::ALL)),
+        outer_layout[0],
+    );
 
     let header = if let Some(devlog) = state.devlogs.get(state.selected) {
         format!("{}", devlog.id)
@@ -93,7 +98,10 @@ fn render(frame: &mut Frame, state: &mut State) {
         String::from_str("No devlogs").expect("idk why that failed bro")
     };
 
-    frame.render_widget(Paragraph::new(header), outer_layout[1]);
+    frame.render_widget(
+        Paragraph::new(header).block(Block::new().fg(Color::Blue).borders(Borders::ALL)),
+        outer_layout[1],
+    );
 
     let text = if let Some(devlog) = state.devlogs.get(state.selected) {
         tui_markdown::from_str(&devlog.body)
