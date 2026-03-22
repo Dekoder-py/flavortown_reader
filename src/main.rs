@@ -6,7 +6,7 @@ use ratatui::{
     },
     layout::{Constraint, Direction, Layout},
     style::{Color, Stylize},
-    widgets::{Block, Borders, Paragraph},
+    widgets::{Block, Borders, Paragraph, Wrap},
 };
 use std::{env, str::FromStr};
 use tui_markdown;
@@ -109,5 +109,5 @@ fn render(frame: &mut Frame, state: &mut State) {
         tui_markdown::from_str("No devlogs")
     };
 
-    frame.render_widget(Paragraph::new(text), outer_layout[2]);
+    frame.render_widget(Paragraph::new(text).wrap(Wrap { trim: false }), outer_layout[2]);
 }
