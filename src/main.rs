@@ -1,4 +1,5 @@
 use std::env;
+use tui_markdown;
 
 use serde::Deserialize;
 
@@ -21,8 +22,4 @@ fn main() {
     let resp: Resp = client.get(url).bearer_auth(token)
         .send().expect("Failed to fetch")
         .json().expect("Failed to parse");
-    
-    for devlog in resp.devlogs.iter().take(2) {
-        println!("{}", devlog.body);
-    }
 }
