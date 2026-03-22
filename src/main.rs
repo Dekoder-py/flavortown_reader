@@ -87,13 +87,13 @@ fn render(frame: &mut Frame, state: &mut State) {
         .split(frame.area());
 
     frame.render_widget(
-        Paragraph::new("Flavortown Reader")
+        Paragraph::new("Flavortown Reader | Something's Cooking!")
             .block(Block::new().bold().fg(Color::Cyan).borders(Borders::ALL)),
         outer_layout[0],
     );
 
     let header = if let Some(devlog) = state.devlogs.get(state.selected) {
-        format!("{}", devlog.id)
+        format!("Devlog #{}", devlog.id)
     } else {
         String::from_str("No devlogs").expect("idk why that failed bro")
     };
