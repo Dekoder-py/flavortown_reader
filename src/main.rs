@@ -191,6 +191,13 @@ fn render_markdown(input: &str) -> Text<'static> {
                 lines.push(Line::from(current_spans.clone()));
                 current_spans.clear();
             }
+
+            Event::Code(t) => {
+                current_spans.push(Span::styled(
+                    format!("{}", t),
+                    Style::default().fg(Color::Yellow),
+                ));
+            }
             _ => {}
         }
     }
