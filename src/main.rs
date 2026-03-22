@@ -6,10 +6,10 @@ use ratatui::{
     },
     layout::{Constraint, Direction, Layout},
     style::{Color, Stylize},
+    text::Text,
     widgets::{Block, Borders, Paragraph, Wrap},
 };
 use std::{env, str::FromStr};
-use tui_markdown;
 
 use serde::Deserialize;
 
@@ -104,10 +104,83 @@ fn render(frame: &mut Frame, state: &mut State) {
     );
 
     let text = if let Some(devlog) = state.devlogs.get(state.selected) {
-        tui_markdown::from_str(&devlog.body)
+        render_markdown(&devlog.body)
     } else {
-        tui_markdown::from_str("No devlogs")
+        render_markdown("No Devlogs!")
     };
 
-    frame.render_widget(Paragraph::new(text).wrap(Wrap { trim: false }), outer_layout[2]);
+    frame.render_widget(
+        Paragraph::new(text)
+            .wrap(Wrap { trim: false })
+            .block(Block::new().borders(Borders::ALL)),
+        outer_layout[2],
+    );
+}
+
+fn render_markdown(input: &str) -> Text<'static> {
+    use pulldown_cmark::{Event, HeadingLevel, Options, Parser, Tag, TagEnd};
+    use ratatui::style::{Color, Modifier, Style};
+    use ratatui::text::{Line, Span, Text};
+
+    let parser = Parser::new_ext(input, Options::all());
+
+    let mut lines: Vec<Line<'static>> = Vec::new();
+    let mut current_spans: Vec<Span<'static>> = Vec::new();
+    let mut current_style = Style::default();
+
+    for event in parser {
+        match event {
+            Event::Start(Tag::Heading { level, .. }) => {
+                current_style = match level {
+                    HeadingLevel::H1 => Style::default()
+                        .fg(Color::Cyan)
+                        .add_modifier(Modifier::BOLD),
+                    HeadingLevel::H2 => Style::default()
+                        .fg(Color::Blue)
+                        .add_modifier(Modifier::BOLD),
+                    _ => Style::default().add_modifier(Modifier::BOLD),
+                };
+            }
+            Event::End(TagEnd::Heading(_)) => {
+                lines.push(Line::from(current_spans.clone()));
+                lines.push(Line::default()); // blank line after heading
+                current_spans.clear();
+                current_style = Style::default();
+            }
+            Event::Start(Tag::Strong) => {
+                current_style = current_style.add_modifier(Modifier::BOLD);
+            }
+            Event::End(TagEnd::Strong) => {
+                current_style = current_style.remove_modifier(Modifier::BOLD);
+            }
+            Event::Start(Tag::Emphasis) => {
+                current_style = current_style.add_modifier(Modifier::ITALIC);
+            }
+            Event::End(TagEnd::Emphasis) => {
+                current_style = current_style.remove_modifier(Modifier::ITALIC);
+            }
+            Event::End(TagEnd::Paragraph) => {
+                lines.push(Line::from(current_spans.clone()));
+                lines.push(Line::default());
+                current_spans.clear();
+            }
+            Event::Text(t) => {
+                current_spans.push(Span::styled(t.to_string(), current_style));
+            }
+            Event::SoftBreak => {
+                current_spans.push(Span::raw(" "));
+            }
+            Event::HardBreak => {
+                lines.push(Line::from(current_spans.clone()));
+                current_spans.clear();
+            }
+            _ => {}
+        }
+    }
+
+    if !current_spans.is_empty() {
+        lines.push(Line::from(current_spans));
+    }
+
+    Text::from(lines)
 }
