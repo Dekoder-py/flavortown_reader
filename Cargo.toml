@@ -2,6 +2,10 @@
 name = "flavortown_reader"
 version = "0.1.0"
 edition = "2024"
+readme = "README.md"
+license = "MIT"
+description = "Read Flavortown Devlogs"
+repository = "https://github.com/Dekoder-py/flavortown_reader"
 
 [dependencies]
 color-eyre = "0.6.5"
