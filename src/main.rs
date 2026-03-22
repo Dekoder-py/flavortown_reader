@@ -1,5 +1,5 @@
 use std::{env, str::FromStr};
-use ratatui::{DefaultTerminal, Frame, layout::{Constraint, Direction, Layout}, widgets::Paragraph};
+use ratatui::{DefaultTerminal, Frame, crossterm::{self, event::{Event, KeyCode}}, layout::{Constraint, Direction, Layout}, widgets::Paragraph};
 use tui_markdown;
 
 use serde::Deserialize;
@@ -37,6 +37,15 @@ fn main() -> color_eyre::Result<()> {
 fn app(terminal: &mut DefaultTerminal, state: &mut State) -> std::io::Result<()> {
     loop {
         terminal.draw(|frame| render(frame, state))?;
+        match crossterm::event::read()? {
+            Event::Key(key) => {
+                if key.code == KeyCode::Char('q') {
+                    break Ok(());
+                }
+            }
+            _ => {
+            }
+        }
     }
 }
 
@@ -56,5 +65,14 @@ fn render(frame: &mut Frame, state: &mut State) {
     };
 
     frame.render_widget(Paragraph::new(header), outer_layout[1]);
+
+    let text = if let Some(devlog) = state.devlogs.get(state.selected) {
+        tui_markdown::from_str(&devlog.body)
+    } else {
+        tui_markdown::from_str("No devlogs")
+    };
+
+    frame.render_widget(Paragraph::new(text), outer_layout[2]);
+
 
 }
