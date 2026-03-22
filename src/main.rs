@@ -148,7 +148,9 @@ fn render_markdown(input: &str) -> Text<'static> {
                 current_style = Style::default();
             }
             Event::Start(Tag::Strong) => {
-                current_style = current_style.add_modifier(Modifier::BOLD);
+                current_style = current_style
+                    .add_modifier(Modifier::BOLD)
+                    .fg(Color::Magenta);
             }
             Event::End(TagEnd::Strong) => {
                 current_style = current_style.remove_modifier(Modifier::BOLD);
@@ -168,9 +170,24 @@ fn render_markdown(input: &str) -> Text<'static> {
                 current_spans.push(Span::styled(t.to_string(), current_style));
             }
             Event::SoftBreak => {
-                current_spans.push(Span::raw(" "));
+                lines.push(Line::from(current_spans.clone()));
+                current_spans.clear();
             }
             Event::HardBreak => {
+                lines.push(Line::from(current_spans.clone()));
+                current_spans.clear();
+            }
+
+            Event::Start(Tag::List(_)) => {
+                // nothing needed on start
+            }
+            Event::End(TagEnd::List(_)) => {
+                lines.push(Line::default()); // blank line after list
+            }
+            Event::Start(Tag::Item) => {
+                current_spans.push(Span::raw("• "));
+            }
+            Event::End(TagEnd::Item) => {
                 lines.push(Line::from(current_spans.clone()));
                 current_spans.clear();
             }
