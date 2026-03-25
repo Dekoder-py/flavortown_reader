@@ -2,6 +2,8 @@
 
 A TUI to read Flavortown devlogs! Written in Rust with Ratatui.
 
+Scroll with 'j' and 'k' and quit with 'q'.
+
 Claude was used to help with parsing markdown.
 
 # IMPORTANT
