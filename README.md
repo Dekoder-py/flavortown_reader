@@ -6,6 +6,9 @@ Scroll with 'j' and 'k' and quit with 'q'.
 
 Claude was used to help with parsing markdown.
 
+> [!IMPORTANT]  
+> If you can't see the text, your terminal is too small! Resize it.
+
 # IMPORTANT
 
 This is a BYO API Key product. Ensure you have `FT_API_KEY` set as an env var before running:
